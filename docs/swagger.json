@@ -1,0 +1,50 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for curating a movie and TV show watch list.",
+        "title": "The List API",
+        "contact": {
+            "name": "Antony Thomas"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/shows": {
+            "get": {
+                "description": "Get all shows currently stored in list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shows"
+                ],
+                "summary": "List all shows",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "list"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new show to the list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shows"
+                ],
+                "summary": "Add new show",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}

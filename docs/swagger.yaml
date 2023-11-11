@@ -1,0 +1,33 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    name: Antony Thomas
+  description: API for curating a movie and TV show watch list.
+  title: The List API
+  version: "1.0"
+paths:
+  /shows:
+    get:
+      description: Get all shows currently stored in list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: list
+      summary: List all shows
+      tags:
+      - shows
+    post:
+      consumes:
+      - application/json
+      description: Add a new show to the list
+      responses:
+        "200":
+          description: OK
+      summary: Add new show
+      tags:
+      - shows
+swagger: "2.0"

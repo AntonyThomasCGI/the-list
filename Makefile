@@ -1,7 +1,18 @@
+.PHONY: all clean
+
+# Variables
+
+out := dist/the-list
+
+all: build run
 
 build:
-	docker build -t the-list .
+	go build -o $(out) main.go
 
 run:
-	docker run -p 127.0.0.1:8080:8080 -it --rm --name the-list-app the-list
+	$(out)
+
+
+clean:
+	$(RM) -r dist/
 

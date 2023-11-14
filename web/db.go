@@ -13,7 +13,7 @@ import (
 var db *sql.DB
 
 type Show struct {
-  ID string `json:"id"`
+  ID int64 `json:"id"`
   Title string `json:"title"`
   Author string `json:"author"`
 }
@@ -33,10 +33,7 @@ func init() {
 
   // Create table if it does not exist.
   sts := `
-CREATE TABLE IF NOT EXISTS the_list (id varchar(36), title varchar(255), author varchar(255));
-INSERT INTO the_list(id, title, author) VALUES('1', 'lawnmower man', 'natasha');
-INSERT INTO the_list(id, title, author) VALUES('2', 'paul blart mall cop', 'antony');
-INSERT INTO the_list(id, title, author) VALUES('3', 'chicken run 2', 'natasha');
+CREATE TABLE IF NOT EXISTS the_list (id INTEGER PRIMARY KEY, title varchar(255), author varchar(255));
 `
   _, err = db.Exec(sts)
 
@@ -67,5 +64,18 @@ func getItems() ([]Show, error) {
     result = append(result, row)
   }
   return result, nil
+}
+
+
+func saveItem(show Show) (int64, error) {
+  result, err := db.Exec("INSERT INTO the_list(title, author) VALUES($1, $2)", show.Title, show.Author)
+  if err != nil {
+    return -1, err
+  }
+  id, err := result.LastInsertId()
+  if err != nil {
+    return -1, err
+  }
+  return id, nil
 }
 

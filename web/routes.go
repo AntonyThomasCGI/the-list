@@ -1,18 +1,28 @@
 package web
 
 import (
-  "fmt"
-  "net/http"
-  "encoding/json"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
 
-  "github.com/julienschmidt/httprouter"
-  logger "github.com/sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
+	logger "github.com/sirupsen/logrus"
 )
 
 type ErrorResponse struct {
-  Message string `json:"message"`
+	Message string `json:"message"`
 }
 
+func home(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	contents, err := os.ReadFile("views/index.html")
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Write(contents)
+}
 
 // getShows godoc
 // @Summary      List all shows
@@ -23,22 +33,21 @@ type ErrorResponse struct {
 // @Failure      400  {object} ErrorResponse
 // @Router       /shows       [get]
 func getShows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-  w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
-  shows, err := getItems()
-  if err != nil {
-    logger.Error(err)
+	shows, err := getItems()
+	if err != nil {
+		logger.Error(err)
 
-    w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 
-    resp := ErrorResponse{Message: err.Error()}
-    json.NewEncoder(w).Encode(resp)
+		resp := ErrorResponse{Message: err.Error()}
+		json.NewEncoder(w).Encode(resp)
 
-    return
-  }
-  json.NewEncoder(w).Encode(shows)
+		return
+	}
+	json.NewEncoder(w).Encode(shows)
 }
-
 
 // postShow godoc
 // @Summary      Add new show
@@ -49,36 +58,35 @@ func getShows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 // @Failure      400 {object} ErrorResponse
 // @Router       /shows [post]
 func postShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-  w.Header().Set("Content-Type", "application/json")
-  var show Show
-  decoder := json.NewDecoder(r.Body)
-  err := decoder.Decode(&show)
-  if err != nil {
-    logger.Error("Could not read body of request: ", err)
+	w.Header().Set("Content-Type", "application/json")
+	var show Show
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&show)
+	if err != nil {
+		logger.Error("Could not read body of request: ", err)
 
-    w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
 
-    resp := ErrorResponse{Message: err.Error()}
-    json.NewEncoder(w).Encode(resp)
+		resp := ErrorResponse{Message: err.Error()}
+		json.NewEncoder(w).Encode(resp)
 
-    return
-  }
-  logger.Info("Got data:")
-  logger.Info(fmt.Sprintf("Title: %s", show.Title))
-  logger.Info(fmt.Sprintf("Author: %s", show.Author))
+		return
+	}
+	logger.Info("Got data:")
+	logger.Info(fmt.Sprintf("Title: %s", show.Title))
+	logger.Info(fmt.Sprintf("Author: %s", show.Author))
 
-  id, err := saveItem(show)
-  if err != nil {
-    logger.Error("Could not read body of request: ", err)
+	id, err := saveItem(show)
+	if err != nil {
+		logger.Error("Error writing entry to db: ", err)
 
-    w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 
-    resp := ErrorResponse{Message: err.Error()}
-    json.NewEncoder(w).Encode(resp)
+		resp := ErrorResponse{Message: err.Error()}
+		json.NewEncoder(w).Encode(resp)
 
-    return
-  }
-  show.ID = id
-  json.NewEncoder(w).Encode(show)
+		return
+	}
+	show.ID = id
+	json.NewEncoder(w).Encode(show)
 }
-

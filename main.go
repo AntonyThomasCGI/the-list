@@ -1,11 +1,9 @@
 package main
 
 import (
-  "the-list/web"
+	"the-list/web"
 )
 
-
 func main() {
-  web.Start()
+	web.Start()
 }
-

@@ -1,7 +1,6 @@
 .PHONY: all clean
 
 # Variables
-
 out := dist/the-list
 
 all: build run
@@ -11,7 +10,6 @@ build:
 
 run:
 	$(out)
-
 
 clean:
 	$(RM) -r dist/

@@ -2,6 +2,8 @@ version: "3"
 services:
   web:
     build: .
+    environment:
+      - NODE_ENV=production
     ports:
       - "8000:8000"
     volumes:

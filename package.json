@@ -7,10 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "dist/the-list",
-    "build": "go build -o dist/the-list main.go",
+    "start": "./dist/the-list",
+    "start:watch": "nodemon --exec go run main.go --signal SIGTERM",
+    "build": "node esbuild.js && go build -o ./dist/the-list main.go",
     "build:watch": "node esbuild.js --watch",
-    "dev": "npm run build && run-p build:watch start"
+    "dev": "npm run build && run-p build:watch start:watch"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "esbuild": "^0.20.0",
+    "nodemon": "^3.0.3",
     "npm-run-all": "^4.1.5"
   }
 }

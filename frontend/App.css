@@ -1,1 +1,13 @@
 @import url("components/Show.css");
+
+
+.centered {
+    display: flex;
+    justify-content: center;
+}
+
+
+#list {
+    background-color: rgb(38, 60, 60);
+    border-radius: 2px;
+}

@@ -3,4 +3,9 @@ div.show {
     color: white;
     background-color: darkcyan;
     margin: 5px;
+    border-radius: 2px;
+}
+
+div.title {
+    font-size: 2em;
 }

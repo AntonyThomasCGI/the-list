@@ -10,8 +10,8 @@ interface ShowProps {
 export const Show: React.FC<ShowProps> = (props) => {
     return (
         <div className="show">
-            <h1>{props.title}</h1>
-            <p>Author: {props.author}</p>
+            <div className="title">{props.title}</div>
+            <div>Author: {props.author}</div>
         </div>
     )
 }

@@ -6,6 +6,7 @@ services:
       - "8000:8000"
     volumes:
       - the-list-db:/etc/the-list
+    stdin_open: true
 volumes:
   the-list-db:
     driver: local

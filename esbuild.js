@@ -4,8 +4,8 @@ const esbuild = require("esbuild");
 const watch = process.argv.slice(2).includes("--watch");
 
 const buildConfig = {
-    entryPoints: ["frontend/App.tsx", "frontend/App.css"],
-    outdir: "public/assets",
+    entryPoints: ["web/src/App.tsx", "web/src/App.css"],
+    outdir: "web/public/assets",
     bundle: true,
     logLevel: "info",
 };

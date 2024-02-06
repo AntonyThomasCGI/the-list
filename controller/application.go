@@ -1,4 +1,4 @@
-package web
+package controller
 
 import (
 	"encoding/json"
@@ -8,14 +8,12 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	logger "github.com/sirupsen/logrus"
+
+	"the-list/db"
 )
 
-type ErrorResponse struct {
-	Message string `json:"message"`
-}
-
-func home(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	contents, err := os.ReadFile("views/index.html")
+func Home(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	contents, err := os.ReadFile("web/public/index.html")
 	if err != nil {
 		logger.Error(err)
 		return
@@ -32,10 +30,10 @@ func home(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 // @Success      200  {List}  []Show
 // @Failure      400  {object} ErrorResponse
 // @Router       /shows       [get]
-func getShows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func GetShows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
-	shows, err := getItems()
+	shows, err := db.GetItems()
 	if err != nil {
 		logger.Error(err)
 
@@ -57,9 +55,9 @@ func getShows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 // @Success      200 {object} Show
 // @Failure      400 {object} ErrorResponse
 // @Router       /shows [post]
-func postShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func PostShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
-	var show Show
+	var show db.Show
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&show)
 	if err != nil {
@@ -76,7 +74,7 @@ func postShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	logger.Info(fmt.Sprintf("Title: %s", show.Title))
 	logger.Info(fmt.Sprintf("Author: %s", show.Author))
 
-	id, err := saveItem(show)
+	id, err := db.SaveItem(show)
 	if err != nil {
 		logger.Error("Error writing entry to db: ", err)
 

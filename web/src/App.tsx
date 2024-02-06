@@ -16,11 +16,16 @@ function App() {
     }, []);
 
     return (
-        <div className="centered">
-            <div id="list">
-                {shows.map((show, idx) => {
-                    return <Show key={idx} title={show.title} author={show.author}/>
-                })}
+        <div>
+            <header className="site-header">
+                <div className="site-logo">The List</div>
+            </header>
+            <div className="centered">
+                <div id="list">
+                    {shows.map((show, idx) => {
+                        return <Show key={idx} title={show.title} author={show.author}/>
+                    })}
+                </div>
             </div>
         </div>
     )

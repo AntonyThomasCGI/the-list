@@ -3,5 +3,5 @@ dist/
 node_modules/
 
 # production
-public/assets
+web/public/assets
 

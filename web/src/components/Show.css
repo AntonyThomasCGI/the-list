@@ -1,7 +1,9 @@
+@import url("../constants.css");
+
 
 div.show {
     color: white;
-    background-color: darkcyan;
+    background-color: var(--accent-color-01);
     margin: 5px;
     border-radius: 2px;
 }

@@ -1,5 +1,29 @@
+@import url("constants.css");
 @import url("components/Show.css");
 
+
+html * {
+    font-family:'Courier New', Courier, monospace;
+    margin: 0;
+}
+
+
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: lightgray;
+}
+
+.site-logo {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2.0em;
+    background-color: var(--background-color-01);
+    color: var(--accent-color-01);
+    padding: 2px 8px;
+    margin: 5px;
+    border-radius: 2px;
+}
 
 .centered {
     display: flex;
@@ -9,6 +33,6 @@
 
 
 #list {
-    background-color: rgb(38, 60, 60);
+    background-color: var(--background-color-01);
     border-radius: 2px;
 }

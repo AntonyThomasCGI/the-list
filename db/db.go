@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS the_list (id INTEGER PRIMARY KEY, title varchar(255),
 		logger.Fatal(err)
 	}
 
-	logger.Info("Succesfully initialized db")
+	logger.Info("Successfully initialized db")
 }
 
 func GetItems() ([]Show, error) {

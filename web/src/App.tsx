@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { Show } from "./components/Show";
+import { Show } from "./Show";
+import { AddShow } from "./AddShow";
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
                 <div className="site-logo">The List</div>
             </header>
             <div className="centered">
+                <AddShow />
                 <div id="list">
                     {shows.map((show, idx) => {
                         return <Show key={idx} title={show.title} author={show.author}/>

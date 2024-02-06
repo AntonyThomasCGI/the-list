@@ -17,6 +17,8 @@ func SetupRoutes() *httprouter.Router {
 	router.GET("/api/v1/shows", controller.GetShows)
 	router.POST("/api/v1/shows", controller.PostShow)
 
+	router.GET("/api/v1/search/shows", controller.SearchShow)
+
 	// TODO, documentation is generated at: /doc/index.html
 	// Is it possible to clean this up?
 	router.GET("/doc/:any", controller.SwaggerHandler)

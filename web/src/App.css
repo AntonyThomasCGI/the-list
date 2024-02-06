@@ -1,5 +1,5 @@
 @import url("constants.css");
-@import url("components/Show.css");
+@import url("Show.css");
 
 
 html * {
@@ -29,8 +29,14 @@ html * {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
+.add-show {
+    font-size: 1.5em;
+    margin: 5px;
+    /*border-radius: 20px;*/
+}
 
 #list {
     background-color: var(--background-color-01);

@@ -3,11 +3,19 @@ package main
 import (
 	"net/http"
 
+	"github.com/joho/godotenv"
 	logger "github.com/sirupsen/logrus"
 
 	_ "the-list/docs"
 	"the-list/routers"
 )
+
+func init() {
+	// loads values from .env into environment.
+	if err := godotenv.Load(); err != nil {
+		logger.Debug("No .env file found")
+	}
+}
 
 // @title           The List API
 // @version         1.0

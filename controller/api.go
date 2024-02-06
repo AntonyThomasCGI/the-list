@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -86,7 +85,19 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	baseUrl := "https://api.themoviedb.org/3/search/multi"
 	apiKey := os.Getenv("TMDB_API_KEY")
 	if apiKey == "" {
-		msg := "TMDB_API_KEY not set!"
+		msg := "TMDB_API_KEY not set in environment!"
+		logger.Error(msg)
+		w.WriteHeader((http.StatusInternalServerError))
+		resp := ErrorResponse{Message: msg}
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+	queryValues := r.URL.Query()
+
+	endpoint := baseUrl + "?api_key=" + apiKey + "&query=" + url.QueryEscape(queryValues.Get("query"))
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		msg := fmt.Sprintf("Error while setting up tmdb request: %s", err.Error())
 		logger.Error(msg)
 		w.WriteHeader((http.StatusInternalServerError))
 		resp := ErrorResponse{Message: msg}
@@ -94,47 +105,20 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 		return
 	}
-
-	queryValues := r.URL.Query()
-
-	logger.Info("==================================================")
-	param, err := io.ReadAll(r.Body)
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-	logger.Info(string(param))
-	logger.Info(ps.ByName("query"))
-	logger.Info(queryValues.Get("query"))
-
-	endpoint := baseUrl + "?api_key=" + apiKey + "&query=" + url.QueryEscape(queryValues.Get("query"))
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		logger.Error(err)
-	}
 	req.Header.Add("accept", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
-		logger.Error(err)
-
+		msg := fmt.Sprintf("Failed to forward request to tmdb: %s", err.Error())
+		logger.Error(msg)
 		w.WriteHeader(http.StatusInternalServerError)
-
-		resp := ErrorResponse{Message: err.Error()}
+		resp := ErrorResponse{Message: msg}
 		json.NewEncoder(w).Encode(resp)
 
 		return
 	}
 
 	defer res.Body.Close()
-
-	//data, err := io.ReadAll(res.Body)
-	//if err != nil {
-	//	logger.Error(err)
-	//	// TODO
-	//	return
-	//}
-	//logger.Info(string(data))
 
 	type rawResult struct {
 		ID          int    `json:"id"`
@@ -149,8 +133,14 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}{}
 	decodeErr := json.NewDecoder(res.Body).Decode(&respJson)
 	if decodeErr != nil {
-		logger.Error(decodeErr)
-		// TODO
+		msg := fmt.Sprintf("Error decoding tmdb response: %s", decodeErr.Error())
+		logger.Error(msg)
+
+		w.WriteHeader((http.StatusInternalServerError))
+
+		resp := ErrorResponse{Message: msg}
+		json.NewEncoder(w).Encode(resp)
+
 		return
 	}
 
@@ -162,7 +152,7 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	transformResult := []formattedResult{}
 	for i := range respJson.Results {
-		// Filter for media types in movie/tv show.
+		// Filter for movie or tv show results only.
 		validMediaType := false
 		for _, a := range []string{"movie", "tv"} {
 			if respJson.Results[i].MediaType == a {
@@ -184,9 +174,6 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			ReleaseDate: respJson.Results[i].ReleaseDate,
 		})
 	}
-	logger.Info("++json resp:")
-	logger.Info(transformResult[0].Title)
-	logger.Info(transformResult[1].Title)
-	logger.Info(transformResult[2].Title)
+
 	json.NewEncoder(w).Encode(transformResult)
 }

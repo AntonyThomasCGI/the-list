@@ -1,13 +1,61 @@
 @import url("constants.css");
+@import url('@fortawesome/fontawesome-free/css/all.min.css');
 
 
 div.show {
+    display: flex;
+    flex-direction: row;
     color: white;
     background-color: var(--accent-color-01);
     margin: 5px;
-    border-radius: 2px;
+    padding: 5px;
+    border-radius: 3px;
+    align-items: center;
 }
 
-div.title {
+div.show-title {
     font-size: 2em;
+}
+
+div.watched {
+    text-decoration: line-through;
+    color: var(--accent-color-03);
+}
+
+
+div.spacer {
+    min-width: 20px;
+    flex: 1 0 0;
+}
+
+
+.checkbox-wrapper input[type="checkbox"] {
+    /* remove default checkbox appearance */
+    -webkit-appearance: none;
+    appearance: none;
+    /* create custom design */
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 0.15em;
+    margin-right: 0.5em;
+    /*border: 0.15em solid red;*/
+    vertical-align: middle;
+    outline: none;
+    cursor: pointer;
+}
+
+input::before {
+    font-family: "Font Awesome 6 Free";
+    content: "\f070";
+    font-size: 1.5em;
+    color: var(--accent-color-02);
+    position: absolute;
+}
+
+input:checked::before {
+    font-family: "Font Awesome 6 Free";
+    content: "\f06e";
+    font-size: 1.5em;
+    color: var(--accent-color-03);
+    position: absolute;
 }

@@ -7,13 +7,12 @@ export const AddShow: React.FC = () => {
         event.preventDefault();
 
         const value = event.target[0].value;
-        console.log(value);
         fetch("/api/v1/search/shows?" + new URLSearchParams({"query": value}))
-        .then(resp => resp.json())
-        .then(data => {
-            console.log(data);
-        })
-        .catch(err => console.log(err));
+            .then(resp => resp.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(err => console.log(err));
     }
 
     return (

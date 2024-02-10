@@ -80,6 +80,10 @@ func PostShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	json.NewEncoder(w).Encode(show)
 }
 
+func UpdateShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+}
+
 // SearchShow godoc
 func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	baseUrl := "https://api.themoviedb.org/3/search/multi"

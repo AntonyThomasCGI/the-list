@@ -14,9 +14,13 @@ func SetupRoutes() *httprouter.Router {
 	// Static files
 	router.ServeFiles("/static/*filepath", http.Dir("./web/public"))
 
+	// TODO, is this right? /show/-serach or something?
 	router.GET("/api/v1/shows", controller.GetShows)
 	router.POST("/api/v1/shows", controller.PostShow)
 
+	router.POST("/api/v1/show/:id", controller.UpdateShow)
+
+	// Maybe this endpoint shouldn't clash with /show /shows
 	router.GET("/api/v1/search/shows", controller.SearchShow)
 
 	// TODO, documentation is generated at: /doc/index.html

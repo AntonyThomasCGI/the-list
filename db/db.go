@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 	"path/filepath"
+	"reflect"
 
 	_ "github.com/mattn/go-sqlite3"
 	logger "github.com/sirupsen/logrus"
@@ -25,7 +26,7 @@ func init() {
 
 	// Create table if it does not exist.
 	sts := `
-CREATE TABLE IF NOT EXISTS the_list (id INTEGER PRIMARY KEY, title varchar(255), author varchar(255));
+CREATE TABLE IF NOT EXISTS the_list (id INTEGER PRIMARY KEY, title VARCHAR(255), author VARCHAR(255), watched INTEGER);
 `
 	_, err = db.Exec(sts)
 
@@ -46,19 +47,36 @@ func GetItems() ([]Show, error) {
 
 	result := []Show{}
 	for rows.Next() {
-		var row Show
+		var show Show
 
-		err = rows.Scan(&row.ID, &row.Title, &row.Author)
+		s := reflect.ValueOf(&show).Elem()
+		numCols := s.NumField()
+		columns := make([]interface{}, numCols)
+		for i := 0; i < numCols; i++ {
+			field := s.Field(i)
+			columns[i] = field.Addr().Interface()
+		}
+
+		err = rows.Scan(columns...)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, row)
+
+		result = append(result, show)
 	}
 	return result, nil
 }
 
 func SaveItem(show Show) (int64, error) {
-	result, err := db.Exec("INSERT INTO the_list(title, author) VALUES($1, $2)", show.Title, show.Author)
+	// Convert bool values to int.
+	var watched int64
+	if show.Watched {
+		watched = 1
+	} else {
+		watched = 0
+	}
+	// Store entry.
+	result, err := db.Exec("INSERT INTO the_list(title, author, watched) VALUES($1, $2, $3)", show.Title, show.Author, watched)
 	if err != nil {
 		return -1, err
 	}

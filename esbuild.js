@@ -8,6 +8,14 @@ const buildConfig = {
     outdir: "web/public/assets",
     bundle: true,
     logLevel: "info",
+    loader: {
+        ".png": "dataurl",
+        ".woff": "dataurl",
+        ".woff2": "dataurl",
+        ".eot": "dataurl",
+        ".ttf": "dataurl",
+        ".svg": "dataurl",
+    },
 };
 
 if (watch) {

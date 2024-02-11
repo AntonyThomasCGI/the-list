@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 
 	"github.com/julienschmidt/httprouter"
-	logger "github.com/sirupsen/logrus"
 
 	"the-list/db"
 )
@@ -26,13 +26,7 @@ func GetShows(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	shows, err := db.GetItems()
 	if err != nil {
-		logger.Error(err)
-
-		w.WriteHeader(http.StatusInternalServerError)
-
-		resp := ErrorResponse{Message: err.Error()}
-		json.NewEncoder(w).Encode(resp)
-
+		writeErrorResponse(err.Error(), w)
 		return
 	}
 	json.NewEncoder(w).Encode(shows)
@@ -52,36 +46,83 @@ func PostShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&show)
 	if err != nil {
-		logger.Error("Could not read body of request: ", err)
-
-		w.WriteHeader(http.StatusBadRequest)
-
-		resp := ErrorResponse{Message: err.Error()}
-		json.NewEncoder(w).Encode(resp)
-
+		writeErrorResponse(err.Error(), w)
 		return
 	}
-	logger.Info("Got data:")
-	logger.Info(fmt.Sprintf("Title: %s", show.Title))
-	logger.Info(fmt.Sprintf("Author: %s", show.Author))
 
 	id, err := db.SaveItem(show)
 	if err != nil {
-		logger.Error("Error writing entry to db: ", err)
-
-		w.WriteHeader(http.StatusInternalServerError)
-
-		resp := ErrorResponse{Message: err.Error()}
-		json.NewEncoder(w).Encode(resp)
-
+		writeErrorResponse(err.Error(), w)
 		return
 	}
 	show.ID = id
 	json.NewEncoder(w).Encode(show)
 }
 
+// TODO, doc string
 func UpdateShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id := ps.ByName("id")
+	if id == "" {
+		writeErrorResponse("Missing required id parameter", w)
+		return
+	}
 
+	body := map[string]interface{}{}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&body)
+	if err != nil {
+		msg := fmt.Sprintf("Error decoding json data: %s", err.Error())
+		writeErrorResponse(msg, w)
+		return
+	}
+
+	show := db.Show{}
+	rt := reflect.TypeOf(show)
+	rv := reflect.ValueOf(show)
+	fields := []string{}
+	for i := 0; i < rt.NumField(); i++ {
+		fields = append(fields, rt.Field(i).Tag.Get("json"))
+	}
+
+	sanitizedData := map[string]interface{}{}
+	for k, v := range body {
+		// Check user field is a legit field on a show.
+		exists := false
+		fieldN := 0
+		for i, field := range fields {
+			if k == field {
+				exists = true
+				fieldN = i
+				break
+			}
+		}
+		if !exists {
+			msg := fmt.Sprintf("Got unexpected field '%s'", k)
+			writeErrorResponse(msg, w)
+			return
+		}
+		dataType := rv.Field(fieldN).Type()
+		castVal, ok := safeCast(v, dataType)
+		if !ok {
+			msg := fmt.Sprintf("Unexpected type for field '%s' expected: %s", k, dataType)
+			writeErrorResponse(msg, w)
+			return
+		}
+		sanitizedData[k] = castVal
+	}
+
+	if len(sanitizedData) == 0 {
+		writeErrorResponse("No fields provided to update", w)
+		return
+	}
+
+	err2 := db.UpdateItem(id, sanitizedData)
+	if err2 != nil {
+		msg := fmt.Sprintf("Failed to write to database: %s", err2.Error())
+		writeErrorResponse(msg, w)
+		return
+	}
 }
 
 // SearchShow godoc
@@ -90,10 +131,7 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	apiKey := os.Getenv("TMDB_API_KEY")
 	if apiKey == "" {
 		msg := "TMDB_API_KEY not set in environment!"
-		logger.Error(msg)
-		w.WriteHeader((http.StatusInternalServerError))
-		resp := ErrorResponse{Message: msg}
-		json.NewEncoder(w).Encode(resp)
+		writeErrorResponse(msg, w)
 		return
 	}
 	queryValues := r.URL.Query()
@@ -102,11 +140,7 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		msg := fmt.Sprintf("Error while setting up tmdb request: %s", err.Error())
-		logger.Error(msg)
-		w.WriteHeader((http.StatusInternalServerError))
-		resp := ErrorResponse{Message: msg}
-		json.NewEncoder(w).Encode(resp)
-
+		writeErrorResponse(msg, w)
 		return
 	}
 	req.Header.Add("accept", "application/json")
@@ -114,11 +148,7 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res, err := client.Do(req)
 	if err != nil {
 		msg := fmt.Sprintf("Failed to forward request to tmdb: %s", err.Error())
-		logger.Error(msg)
-		w.WriteHeader(http.StatusInternalServerError)
-		resp := ErrorResponse{Message: msg}
-		json.NewEncoder(w).Encode(resp)
-
+		writeErrorResponse(msg, w)
 		return
 	}
 
@@ -138,13 +168,7 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	decodeErr := json.NewDecoder(res.Body).Decode(&respJson)
 	if decodeErr != nil {
 		msg := fmt.Sprintf("Error decoding tmdb response: %s", decodeErr.Error())
-		logger.Error(msg)
-
-		w.WriteHeader((http.StatusInternalServerError))
-
-		resp := ErrorResponse{Message: msg}
-		json.NewEncoder(w).Encode(resp)
-
+		writeErrorResponse(msg, w)
 		return
 	}
 

@@ -2,9 +2,11 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	logger "github.com/sirupsen/logrus"
@@ -67,16 +69,32 @@ func GetItems() ([]Show, error) {
 	return result, nil
 }
 
-func SaveItem(show Show) (int64, error) {
-	// Convert bool values to int.
-	var watched int64
-	if show.Watched {
-		watched = 1
-	} else {
-		watched = 0
+func UpdateItem(id string, data map[string]interface{}) error {
+	fieldValues := make([]string, 0, len(data))
+	values := make([]any, 0, len(data))
+	for k, v := range data {
+		fieldValue := fmt.Sprintf("%s = ?", k)
+		fieldValues = append(fieldValues, fieldValue)
+		strVal := fmt.Sprintf("%v", v)
+		values = append(values, strVal)
 	}
-	// Store entry.
-	result, err := db.Exec("INSERT INTO the_list(title, author, watched) VALUES($1, $2, $3)", show.Title, show.Author, watched)
+	query := "UPDATE the_list SET " + strings.Join(fieldValues, ", ") + fmt.Sprintf(" WHERE id = %v", id)
+	_, err := db.Exec(query, values...)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	// TODO, get db.Exec res and find rows affected
+	return nil
+}
+
+func SaveItem(show Show) (int64, error) {
+	result, err := db.Exec(
+		"INSERT INTO the_list(title, author, watched) VALUES($1, $2, $3)",
+		show.Title,
+		show.Author,
+		show.Watched,
+	)
 	if err != nil {
 		return -1, err
 	}

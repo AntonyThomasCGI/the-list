@@ -18,7 +18,7 @@ div.show-title {
 }
 
 div.watched {
-    text-decoration: line-through;
+    /*text-decoration: line-through;*/
     color: var(--accent-color-03);
 }
 
@@ -38,7 +38,6 @@ div.spacer {
     height: 1.6em;
     border-radius: 0.15em;
     margin-right: 0.5em;
-    /*border: 0.15em solid red;*/
     vertical-align: middle;
     outline: none;
     cursor: pointer;
@@ -46,16 +45,13 @@ div.spacer {
 
 input::before {
     font-family: "Font Awesome 6 Free";
-    content: "\f070";
+    content: "\f070";  /* fa-eye-slash */
     font-size: 1.5em;
     color: var(--accent-color-02);
-    position: absolute;
 }
 
 input:checked::before {
-    font-family: "Font Awesome 6 Free";
-    content: "\f06e";
-    font-size: 1.5em;
+    content: "\f06e";  /* fa-eye */
     color: var(--accent-color-03);
-    position: absolute;
+    padding-left: 1px;  /* fix slight misalignment of eye icons */
 }

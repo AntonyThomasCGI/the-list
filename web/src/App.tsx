@@ -25,7 +25,7 @@ function App() {
                 <AddShow />
                 <div id="list">
                     {shows.map((show, idx) => {
-                        return <Show key={idx} title={show.title} author={show.author} watched={show.watched}/>
+                        return <Show key={idx} id={show.id} title={show.title} author={show.author} watched={show.watched}/>
                     })}
                 </div>
             </div>

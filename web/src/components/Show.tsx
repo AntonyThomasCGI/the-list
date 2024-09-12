@@ -2,14 +2,15 @@
 import React, { useState } from "react";
 
 
-interface ShowProps {
+export interface Show {
     id: number;
     title: string;
     author: string;
     watched: boolean;
 }
 
-export const Show: React.FC<ShowProps> = (props) => {
+
+export const ShowComponent: React.FC<Show> = (props) => {
     const [watched, setWatched] = useState(props.watched);
 
     function handleChecked(event: React.ChangeEvent<HTMLInputElement>) {

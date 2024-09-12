@@ -1,9 +1,12 @@
+@import url("components/AddShow.css");
+@import url("components/Show.css");
 @import url("constants.css");
-@import url("Show.css");
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
 
 html * {
-    font-family:'Courier New', Courier, monospace;
+    font-family: "Roboto", sans-serif;
     margin: 0;
 }
 
@@ -17,12 +20,18 @@ html * {
 
 .site-logo {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 2.0em;
     background-color: var(--background-color-01);
     color: var(--accent-color-01);
     padding: 2px 8px;
     margin: 5px;
     border-radius: 2px;
+}
+
+.topbar-container {
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 100%;
 }
 
 .centered {
@@ -33,12 +42,11 @@ html * {
 }
 
 .add-show {
-    font-size: 1.5em;
     margin: 5px;
     /*border-radius: 20px;*/
 }
 
-#list {
+/*#list {
     background-color: var(--background-color-01);
     border-radius: 2px;
-}
+}*/

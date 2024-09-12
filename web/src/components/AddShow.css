@@ -1,0 +1,18 @@
+
+@import url("../constants.css");
+
+.dropdown
+{
+    position: absolute;
+    background-color: white;
+    display: grid;
+}
+
+.dropdown-content a {
+    color: var(--background-color-01);
+    text-decoration: none;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown {display: block;}

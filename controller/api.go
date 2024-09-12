@@ -155,11 +155,12 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer res.Body.Close()
 
 	type rawResult struct {
-		ID          int    `json:"id"`
-		Title       string `json:"title"`
-		Name        string `json:"name"`
-		MediaType   string `json:"media_type"`
-		ReleaseDate string `json:"release_data"`
+		ID           int    `json:"id"`
+		Title        string `json:"title"`
+		Name         string `json:"name"`
+		MediaType    string `json:"media_type"`
+		ReleaseDate  string `json:"release_date"`
+		FirstAirDate string `json:"first_air_date"`
 	}
 
 	respJson := struct {
@@ -175,7 +176,7 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	type formattedResult struct {
 		ID          int    `json:"id"`
 		Title       string `json:"title"`
-		ReleaseDate string `json:"release_data"`
+		ReleaseDate string `json:"release_date"`
 	}
 
 	transformResult := []formattedResult{}
@@ -191,16 +192,23 @@ func SearchShow(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		if !validMediaType {
 			continue
 		}
-		// Movies have title, tv shows have name json fields for some dumb reason.
+		// Catch difference in tv show and movie field names.
 		title := respJson.Results[i].Title
+		releaseDate := respJson.Results[i].ReleaseDate
 		if title == "" {
 			title = respJson.Results[i].Name
+			releaseDate = respJson.Results[i].FirstAirDate
 		}
+		fmt.Println(respJson.Results[i].ReleaseDate)
 		transformResult = append(transformResult, formattedResult{
 			ID:          respJson.Results[i].ID,
 			Title:       title,
-			ReleaseDate: respJson.Results[i].ReleaseDate,
+			ReleaseDate: releaseDate,
 		})
+		// Max 8 results.
+		if i > 8 {
+			break
+		}
 	}
 
 	json.NewEncoder(w).Encode(transformResult)
